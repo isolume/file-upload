@@ -59,7 +59,7 @@ app.prepare().then(() => {
   });
 }); 
 
-cron.schedule('0/15 * * * *', () => {
+cron.schedule('*/15 * * * *', () => {
   console.log('Running a task to delete expired files');
   deleteExpiredFiles();
 });
