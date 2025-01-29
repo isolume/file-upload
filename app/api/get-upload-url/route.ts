@@ -6,7 +6,6 @@ export async function POST(request: Request) {
   try {
     const { filename, fileType, fileSize, expirationHours } = await request.json();
 
-    // Validate inputs
     if (!filename || !fileType || !fileSize || !expirationHours) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }

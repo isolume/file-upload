@@ -17,7 +17,6 @@ export default function FileUpload() {
         try {
             setUploadStatus({ success: false, message: "アップロード中" })
 
-            // Get presigned URL
             const presignedResponse = await fetch('/api/get-upload-url', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -31,14 +30,12 @@ export default function FileUpload() {
 
             const { url, fields, fileName } = await presignedResponse.json()
 
-            // Create form data with required fields
             const formData = new FormData()
             Object.entries(fields).forEach(([key, value]) => {
                 formData.append(key, value as string)
             })
             formData.append('file', file)
 
-            // Upload to S3
             const uploadResponse = await fetch(url, {
                 method: 'POST',
                 body: formData
@@ -48,7 +45,6 @@ export default function FileUpload() {
                 throw new Error('Upload failed')
             }
 
-            // Create database record
             const result = await createFileRecord(fileName, parseInt(expirationTime))
             setUploadStatus(result)
         } catch (error) {

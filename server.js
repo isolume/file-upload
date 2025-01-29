@@ -1,13 +1,11 @@
 const express = require('express');
 const next = require('next');
-const path = require('path');
-const fs = require('fs');
 const cron = require('node-cron');
-const mime = require('mime-types');
 const { deleteExpiredFiles } = require('./scripts/deleteExpiredFiles.js');
 const { GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { s3Client, BUCKET_NAME } = require('./lib/s3.mjs');
-const { Readable } = require('stream');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -16,12 +14,11 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
   const server = express();
 
-  // Custom route to serve files
-  server.get('/:fileName', async (req, res) => {
+  server.get('/:fileName', async (req, res, next) => {
     const { fileName } = req.params;
 
-    if (fileName == 'terms' || fileName == 'favicon.ico') {
-        return handle(req, res);
+    if (fileName === 'terms' || fileName === 'favicon.ico') {
+      return handle(req, res);
     }
 
     try {
@@ -30,35 +27,28 @@ app.prepare().then(() => {
         Key: fileName,
       });
       
-      const response = await s3Client.send(command);
+      const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
       
-      if (response.ContentType) {
-        res.setHeader('Content-Type', response.ContentType);
-      }
+      // Create a one-time proxy for this specific request
+      const proxy = createProxyMiddleware({
+        target: signedUrl,
+        changeOrigin: true,
+        pathRewrite: (path) => '',  
+        onProxyRes: (proxyRes, req, res) => {
+          if (proxyRes.statusCode === 403 || proxyRes.statusCode === 404) {
+            proxyRes.statusCode = 404;
+          }
+        }
+      });
 
-      // Handle different response.Body types
-      const body = response.Body;
-      if (body instanceof Readable) {
-        // If it's already a readable stream, pipe it
-        body.pipe(res);
-      } else if (body instanceof Uint8Array || Buffer.isBuffer(body)) {
-        // If it's a Uint8Array or Buffer, send it directly
-        res.send(body);
-      } else if (typeof body === 'string') {
-        // If it's a string, send it as-is
-        res.send(body);
-      } else {
-        // For other types, try to convert to buffer
-        const buffer = Buffer.from(await body.transformToByteArray());
-        res.send(buffer);
-      }
+      // Use the proxy for this request
+      proxy(req, res, next);
     } catch (error) {
-      console.error('Error fetching file:', error);
+      console.error('Error setting up proxy:', error);
       res.status(404).json({ error: 'File not found' });
     }
   });
 
-  // Default Next.js request handler
   server.all('*', (req, res) => {
     return handle(req, res);
   });
@@ -70,6 +60,6 @@ app.prepare().then(() => {
 }); 
 
 cron.schedule('0/15 * * * *', () => {
-    console.log('Running a task to delete expired files');
-    deleteExpiredFiles();
-  });
+  console.log('Running a task to delete expired files');
+  deleteExpiredFiles();
+});
