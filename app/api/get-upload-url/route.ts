@@ -1,5 +1,5 @@
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
-import { s3Client, BUCKET_NAME } from "@/lib/s3";
+import { s3Client, BUCKET_NAME } from "@/lib/s3.mjs";
 import crypto from "crypto";
 
 export async function POST(request: Request) {
