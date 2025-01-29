@@ -17,7 +17,7 @@ export async function deleteExpiredFiles() {
 
     for (const file of expiredFiles) {
       try {
-        const s3Key = file.path || file.name;
+        const s3Key = file.name;
         
         await s3Client.send(new DeleteObjectCommand({
           Bucket: BUCKET_NAME,
