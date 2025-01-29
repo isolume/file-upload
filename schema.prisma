@@ -1,0 +1,16 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "cockroachdb"
+    url = env("DATABASE_URL")
+}
+
+model File {
+  id             Int      @id @default(sequence())
+  name           String
+  uploadTime     DateTime     @default(now())
+  expirationDate DateTime
+  hash           String
+}
