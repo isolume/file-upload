@@ -9,6 +9,7 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@
 export default function FileUpload() {
     const [uploadStatus, setUploadStatus] = useState<{ success: boolean; message: string; url?: string } | null>(null)
     const [expirationTime, setExpirationTime] = useState("1")
+    const [uploadProgress, setUploadProgress] = useState(0)
 
     const onDrop = async (acceptedFiles: File[]) => {
         const file = acceptedFiles[0]
@@ -16,6 +17,7 @@ export default function FileUpload() {
 
         try {
             setUploadStatus({ success: false, message: "アップロード中" })
+            setUploadProgress(0)
 
             const presignedResponse = await fetch('/api/get-upload-url', {
                 method: 'POST',
@@ -36,14 +38,31 @@ export default function FileUpload() {
             })
             formData.append('file', file)
 
-            const uploadResponse = await fetch(url, {
-                method: 'POST',
-                body: formData
-            })
+            await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest()
+                
+                xhr.upload.addEventListener('progress', (event) => {
+                    if (event.lengthComputable) {
+                        const progress = Math.round((event.loaded * 100) / event.total)
+                        setUploadProgress(progress)
+                    }
+                })
 
-            if (!uploadResponse.ok) {
-                throw new Error('Upload failed')
-            }
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 200 || xhr.status === 204) {
+                        resolve(xhr.response)
+                    } else {
+                        reject(new Error('Upload failed'))
+                    }
+                })
+
+                xhr.addEventListener('error', () => {
+                    reject(new Error('Upload failed'))
+                })
+
+                xhr.open('POST', url)
+                xhr.send(formData)
+            })
 
             const result = await createFileRecord(fileName, parseInt(expirationTime))
             setUploadStatus(result)
@@ -95,39 +114,49 @@ export default function FileUpload() {
       </div>
       {uploadStatus && (
         <div
-          className={`mt-4 p-4 rounded-lg ${
+          className={`mt-4 p-4 rounded-lg relative overflow-hidden ${
             uploadStatus.message === "アップロード中"
-              ? "bg-orange-100 text-orange-700"
+              ? "bg-green-50 text-green-700"
               : uploadStatus.success
               ? "bg-green-200 text-green-700"
               : "bg-red-200 text-red-700"
           }`}
         >
-          {uploadStatus.message === "アップロード中" ? (
-            <>
-              <Hourglass className="inline-block mr-2" />
-              {uploadStatus.message}
-            </>
-          ) : uploadStatus.success ? (
-            <>
-              {uploadStatus.url && (
-                <>
-                  <ClipboardCopy className="inline-block mr-2" />
-                  <a
-                    onClick={() => handleCopyToClipboard(uploadStatus.url)}
-                    className="cursor-pointer border-2 border-dotted border-green-700 rounded-md p-1.5 bg-white bg-opacity-20 backdrop-blur-sm"
-                  >
-                    {uploadStatus.url}
-                  </a>
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <XCircle className="inline-block mr-2" />
-              {uploadStatus.message}
-            </>
+          {uploadStatus.message === "アップロード中" && (
+            <div
+              className="absolute inset-0 bg-green-200 text-green-700 transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            />
           )}
+          
+          <div className="relative">
+            {uploadStatus.message === "アップロード中" ? (
+              <>
+                <Hourglass className="inline-block mr-2" />
+                {uploadStatus.message}
+                <span className="ml-2">({uploadProgress}%)</span>
+              </>
+            ) : uploadStatus.success ? (
+              <>
+                {uploadStatus.url && (
+                  <>
+                    <ClipboardCopy className="inline-block mr-2" />
+                    <a
+                      onClick={() => handleCopyToClipboard(uploadStatus.url)}
+                      className="cursor-pointer border-2 border-dotted border-green-700 rounded-md p-1.5 bg-white bg-opacity-20 backdrop-blur-sm"
+                    >
+                      {uploadStatus.url}
+                    </a>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <XCircle className="inline-block mr-2" />
+                {uploadStatus.message}
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>
