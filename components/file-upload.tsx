@@ -122,10 +122,10 @@ export default function FileUpload() {
       </div>
       <div className="mt-4">
         <Select onValueChange={setExpirationTime} defaultValue={expirationTime}>
-          <SelectTrigger className="w-full bg-white bg-opacity-20 backdrop-blur-sm border-blue-300 text-blue-900">
+          <SelectTrigger className="w-full bg-white/20 backdrop-blur-sm border-blue-300 text-blue-900">
             <SelectValue placeholder="Select expiration time" />
           </SelectTrigger>
-          <SelectContent className="bg-white bg-opacity-20 backdrop-blur-sm border-blue-300">
+          <SelectContent className="bg-white/20 backdrop-blur-sm border-blue-300">
             <SelectItem value="1" className="text-blue-900">
               1時間
             </SelectItem>
@@ -173,7 +173,7 @@ export default function FileUpload() {
                     )}
                     <a
                       onClick={() => handleCopyToClipboard(uploadStatus.url)}
-                      className="cursor-pointer border-2 border-dotted border-green-700 rounded-md p-1.5 bg-white bg-opacity-20 backdrop-blur-sm"
+                      className="cursor-pointer border-2 border-dotted border-green-700 rounded-md p-1.5 bg-white/20 backdrop-blur-sm"
                     >
                       {uploadStatus.url}
                     </a>
