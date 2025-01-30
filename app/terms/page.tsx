@@ -1,7 +1,7 @@
 export default function Terms() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-400 to-blue-600 flex flex-col items-center justify-center p-4">
-      <div className="bg-white bg-opacity-10 p-8 rounded-lg backdrop-blur-sm max-w-4xl w-full">
+      <div className="bg-white/10 p-8 rounded-lg backdrop-blur-sm max-w-4xl w-full">
         <h1 className="text-3xl font-bold text-white mb-6">Terms</h1>
         <div className="text-white space-y-4">
           <h3 className="text-xl font-bold text-white mb-6">

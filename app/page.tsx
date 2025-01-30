@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-400 to-blue-600 relative overflow-hidden">
       <main className="flex-grow flex flex-col items-center justify-center p-4 z-10">
-        <div className="bg-white bg-opacity-10 p-8 rounded-lg backdrop-blur-sm">
+        <div className="bg-white/10 p-8 rounded-lg backdrop-blur-sm">
           <h1 className="text-4xl font-bold text-white mb-8 text-center">
             海 .ト
           </h1>
