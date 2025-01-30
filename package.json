@@ -27,7 +27,7 @@
     "@radix-ui/react-select": "^2.1.5",
     "@tailwindcss/postcss": "^4.0.1",
     "@types/express": "^5.0.0",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "clsx": "^2.1.1",
