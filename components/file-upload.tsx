@@ -1,91 +1,117 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { createFileRecord } from "@/app/upload-action"
-import { useDropzone } from "react-dropzone"
-import { Upload, ClipboardCopy, Hourglass, XCircle } from "lucide-react"
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
+import { useState } from "react";
+import { createFileRecord } from "@/app/upload-action";
+import { useDropzone } from "react-dropzone";
+import {
+  Upload,
+  ClipboardCopy,
+  ClipboardCheck,
+  Hourglass,
+  XCircle,
+} from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function FileUpload() {
-    const [uploadStatus, setUploadStatus] = useState<{ success: boolean; message: string; url?: string } | null>(null)
-    const [expirationTime, setExpirationTime] = useState("1")
-    const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadStatus, setUploadStatus] = useState<{
+    success: boolean;
+    message: string;
+    url?: string;
+  } | null>(null);
+  const [expirationTime, setExpirationTime] = useState("1");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isCopied, setIsCopied] = useState(false);
 
-    const onDrop = async (acceptedFiles: File[]) => {
-        const file = acceptedFiles[0]
-        if (!file) return
+  const onDrop = async (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (!file) return;
 
-        try {
-            setUploadStatus({ success: false, message: "アップロード中" })
-            setUploadProgress(0)
+    try {
+      setUploadStatus({ success: false, message: "アップロード中" });
+      setUploadProgress(0);
 
-            const presignedResponse = await fetch('/api/get-upload-url', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    filename: file.name,
-                    fileType: file.type,
-                    fileSize: file.size,
-                    expirationHours: parseInt(expirationTime)
-                })
-            })
+      const presignedResponse = await fetch("/api/get-upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          expirationHours: parseInt(expirationTime),
+        }),
+      });
 
-            const { url, fields, fileName } = await presignedResponse.json()
+      const { url, fields, fileName } = await presignedResponse.json();
 
-            const formData = new FormData()
-            Object.entries(fields).forEach(([key, value]) => {
-                formData.append(key, value as string)
-            })
-            formData.append('file', file)
+      const formData = new FormData();
+      Object.entries(fields).forEach(([key, value]) => {
+        formData.append(key, value as string);
+      });
+      formData.append("file", file);
 
-            await new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest()
-                
-                xhr.upload.addEventListener('progress', (event) => {
-                    if (event.lengthComputable) {
-                        const progress = Math.round((event.loaded * 100) / event.total)
-                        setUploadProgress(progress)
-                    }
-                })
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
 
-                xhr.addEventListener('load', () => {
-                    if (xhr.status === 200 || xhr.status === 204) {
-                        resolve(xhr.response)
-                    } else {
-                        reject(new Error('Upload failed'))
-                    }
-                })
+        xhr.upload.addEventListener("progress", (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded * 100) / event.total);
+            setUploadProgress(progress);
+          }
+        });
 
-                xhr.addEventListener('error', () => {
-                    reject(new Error('Upload failed'))
-                })
+        xhr.addEventListener("load", () => {
+          if (xhr.status === 200 || xhr.status === 204) {
+            resolve(xhr.response);
+          } else {
+            reject(new Error("Upload failed"));
+          }
+        });
 
-                xhr.open('POST', url)
-                xhr.send(formData)
-            })
+        xhr.addEventListener("error", () => {
+          reject(new Error("Upload failed"));
+        });
 
-            const result = await createFileRecord(fileName, parseInt(expirationTime))
-            setUploadStatus(result)
-        } catch (error) {
-            console.error("Upload error:", error)
-            setUploadStatus({ success: false, message: "ファイルアップロードに失敗しました" })
-        }
+        xhr.open("POST", url);
+        xhr.send(formData);
+      });
+
+      const result = await createFileRecord(fileName, parseInt(expirationTime));
+      setUploadStatus(result);
+    } catch (error) {
+      console.error("Upload error:", error);
+      setUploadStatus({
+        success: false,
+        message: "ファイルアップロードに失敗しました",
+      });
     }
+  };
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-    const handleCopyToClipboard = (url: string | undefined) => {
-        if (!url) return
-
-        navigator.clipboard.writeText(url)
+  const handleCopyToClipboard = (url: string | undefined) => {
+    if (url) {
+      navigator.clipboard.writeText(url);
+      setIsCopied(true);
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
     }
+  };
 
-    return (
-        <div className="w-full max-w-md">
+  return (
+    <div className="w-full max-w-md">
       <div
         {...getRootProps()}
         className={`p-8 border-4 px-24 border-dashed rounded-lg text-center cursor-pointer transition-colors ${
-          isDragActive ? "border-white bg-blue-500" : "border-blue-300 bg-blue-100"
+          isDragActive
+            ? "border-white bg-blue-500"
+            : "border-blue-300 bg-blue-100"
         }`}
       >
         <input {...getInputProps()} />
@@ -128,7 +154,7 @@ export default function FileUpload() {
               style={{ width: `${uploadProgress}%` }}
             />
           )}
-          
+
           <div className="relative">
             {uploadStatus.message === "アップロード中" ? (
               <>
@@ -139,15 +165,19 @@ export default function FileUpload() {
             ) : uploadStatus.success ? (
               <>
                 {uploadStatus.url && (
-                  <>
-                    <ClipboardCopy className="inline-block mr-2" />
+                  <div className="cursor-pointer">
+                    {isCopied ? (
+                      <ClipboardCheck className="inline-block mr-2" />
+                    ) : (
+                      <ClipboardCopy className="inline-block mr-2" />
+                    )}
                     <a
                       onClick={() => handleCopyToClipboard(uploadStatus.url)}
                       className="cursor-pointer border-2 border-dotted border-green-700 rounded-md p-1.5 bg-white bg-opacity-20 backdrop-blur-sm"
                     >
                       {uploadStatus.url}
                     </a>
-                  </>
+                  </div>
                 )}
               </>
             ) : (
@@ -160,5 +190,5 @@ export default function FileUpload() {
         </div>
       )}
     </div>
-    )
+  );
 }
