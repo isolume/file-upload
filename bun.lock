@@ -14,7 +14,7 @@
       "devDependencies": {
         "@aws-sdk/client-s3": "^3.735.0",
         "@aws-sdk/s3-presigned-post": "^3.735.0",
-        "@aws-sdk/s3-request-presigner": "^3.735.0",
+        "@aws-sdk/s3-request-presigner": "^3.738.0",
         "@eslint/eslintrc": "^3",
         "@prisma/client": "^6.3.0",
         "@radix-ui/react-select": "^2.1.5",
@@ -98,7 +98,7 @@
 
     "@aws-sdk/s3-presigned-post": ["@aws-sdk/s3-presigned-post@3.735.0", "", { "dependencies": { "@aws-sdk/client-s3": "3.735.0", "@aws-sdk/types": "3.734.0", "@aws-sdk/util-format-url": "3.734.0", "@smithy/middleware-endpoint": "^4.0.2", "@smithy/signature-v4": "^5.0.1", "@smithy/types": "^4.1.0", "@smithy/util-hex-encoding": "^4.0.0", "@smithy/util-utf8": "^4.0.0", "tslib": "^2.6.2" } }, "sha512-NVbV2Wn2w/az8b5LanYdaf5fGpXrc4oaPHSkSirB3cVrGRFg5JhH5rclJy7pX4GkZXdAtEH4VF2y+r+GGanbMg=="],
 
-    "@aws-sdk/s3-request-presigner": ["@aws-sdk/s3-request-presigner@3.735.0", "", { "dependencies": { "@aws-sdk/signature-v4-multi-region": "3.734.0", "@aws-sdk/types": "3.734.0", "@aws-sdk/util-format-url": "3.734.0", "@smithy/middleware-endpoint": "^4.0.2", "@smithy/protocol-http": "^5.0.1", "@smithy/smithy-client": "^4.1.2", "@smithy/types": "^4.1.0", "tslib": "^2.6.2" } }, "sha512-PzfS4rWDLlp22NORWmezA8ZH6uwz7fAmYfdIbWsPKoy1Rpm+/6Kqn7Nx+Taz6UKNhGPtexutCoJqsMxCy0ZmxQ=="],
+    "@aws-sdk/s3-request-presigner": ["@aws-sdk/s3-request-presigner@3.738.0", "", { "dependencies": { "@aws-sdk/signature-v4-multi-region": "3.734.0", "@aws-sdk/types": "3.734.0", "@aws-sdk/util-format-url": "3.734.0", "@smithy/middleware-endpoint": "^4.0.2", "@smithy/protocol-http": "^5.0.1", "@smithy/smithy-client": "^4.1.2", "@smithy/types": "^4.1.0", "tslib": "^2.6.2" } }, "sha512-cGENzkOxfAqrLfUdwYETDFiMOGjvicXV2EJe8sSH9Tw3wlm74WrIjZdw6ObHzm7AFnduHRNLVgX3KOtU7MlfCw=="],
 
     "@aws-sdk/signature-v4-multi-region": ["@aws-sdk/signature-v4-multi-region@3.734.0", "", { "dependencies": { "@aws-sdk/middleware-sdk-s3": "3.734.0", "@aws-sdk/types": "3.734.0", "@smithy/protocol-http": "^5.0.1", "@smithy/signature-v4": "^5.0.1", "@smithy/types": "^4.1.0", "tslib": "^2.6.2" } }, "sha512-GSRP8UH30RIYkcpPILV4pWrKFjRmmNjtUd41HTKWde5GbjJvNYpxqFXw2aIJHjKTw/js3XEtGSNeTaQMVVt3CQ=="],
 
