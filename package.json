@@ -25,7 +25,7 @@
     "@eslint/eslintrc": "^3",
     "@prisma/client": "^6.3.0",
     "@radix-ui/react-select": "^2.1.5",
-    "@tailwindcss/postcss": "^4.0.1",
+    "@tailwindcss/postcss": "^4.0.3",
     "@types/express": "^5.0.0",
     "@types/node": "^22",
     "@types/react": "^19",
