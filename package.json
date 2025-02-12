@@ -1,7 +1,6 @@
 {
   "name": "umi2",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
   "scripts": {
     "dev": "bun run server.js",
     "build": "next build",
