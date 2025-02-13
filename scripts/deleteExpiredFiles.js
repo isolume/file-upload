@@ -15,6 +15,14 @@ export async function deleteExpiredFiles() {
       },
     })
 
+    await prisma.file.deleteMany({
+      where: {
+        expirationDate: {
+          lte: now,
+        },
+      },
+    })
+
     for (const file of expiredFiles) {
       try {
         const s3Key = file.name
@@ -25,12 +33,6 @@ export async function deleteExpiredFiles() {
             Key: s3Key,
           })
         )
-
-        await prisma.file.delete({
-          where: {
-            id: file.id,
-          },
-        })
       } catch (err) {
         console.error(`Error deleting file ${file.name} (id: ${file.id}):`, err)
       }
