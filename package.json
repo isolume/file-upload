@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.741.0",
-    "@aws-sdk/s3-presigned-post": "^3.738.0",
+    "@aws-sdk/s3-presigned-post": "^3.750.0",
     "@aws-sdk/s3-request-presigner": "^3.744.0",
     "@eslint/eslintrc": "^3",
     "@prisma/client": "^6.3.0",
